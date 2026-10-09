@@ -1,7 +1,11 @@
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+import { useProfile } from '@/lib/profile';
+
 export default function TabLayout() {
+  const { isTeacher } = useProfile();
+
   return (
     <Tabs
       screenOptions={{
@@ -65,21 +69,21 @@ export default function TabLayout() {
         }}
       />
 
-
+      {/* Only teachers see this tab. href: null hides it from the tab bar. */}
       <Tabs.Screen
-  name="teacher"
-  options={{
-    title: 'Teacher',
-    tabBarIcon: ({ color, focused }) => (
-      <Ionicons
-        name={focused ? 'clipboard' : 'clipboard-outline'}
-        color={color}
-        size={24}
+        name="teacher"
+        options={{
+          title: 'Teacher',
+          href: isTeacher ? '/teacher' : null,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'clipboard' : 'clipboard-outline'}
+              color={color}
+              size={24}
+            />
+          ),
+        }}
       />
-    ),
-  }}
-/>
-
     </Tabs>
   );
 }

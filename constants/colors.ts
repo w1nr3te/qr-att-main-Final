@@ -8,4 +8,6 @@ export const COLORS = {
   surface: '#112240',
   border: '#1B3A4B',
   shadow: '#00E5FF',
+  danger: '#FF4D4D',
+  accent: '#00E5FF',
 } as const;

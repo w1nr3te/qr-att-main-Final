@@ -2,8 +2,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
+import { Redirect } from 'expo-router';
 import { useState } from 'react';
 import {
+  ActivityIndicator,
   Platform,
   Pressable,
   ScrollView,
@@ -17,6 +19,7 @@ import QRCode from 'react-native-qrcode-svg';
 import AppButton from '@/components/AppButton';
 import { COLORS } from '@/constants/colors';
 import { createEvent } from '@/lib/database';
+import { useProfile } from '@/lib/profile';
 
 function toLocalISO(date: Date) {
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -43,6 +46,8 @@ const QUICK_END_OPTIONS = [
 type EditTarget = 'start' | 'end';
 
 export default function TeacherScreen() {
+  const { isTeacher, loading } = useProfile();
+
   const [title, setTitle] = useState('');
   const [eventId, setEventId] = useState('');
   const [startDate, setStartDate] = useState(() => new Date());
@@ -112,19 +117,36 @@ export default function TeacherScreen() {
       return;
     }
 
-    createEvent(event).then(() => {
-      setMessage('Event saved! Scan the QR with the Scan tab to test it.');
-      setPayload(
-        JSON.stringify({
-          v: 1,
-          event: event.eventId,
-          title: event.title,
-          start: event.start,
-          end: event.end,
-        })
-      );
-    });
+    createEvent(event)
+      .then(() => {
+        setMessage('Event saved! Scan the QR with the Scan tab to test it.');
+        setPayload(
+          JSON.stringify({
+            v: 1,
+            event: event.eventId,
+            title: event.title,
+            start: event.start,
+            end: event.end,
+          })
+        );
+      })
+      .catch(() => {
+        setMessage('Could not save the event. Only teachers can create events.');
+      });
   };
+
+  // ---- Role guard (must stay AFTER all hooks above) ----
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
+  if (!isTeacher) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <ScrollView
@@ -239,6 +261,12 @@ function PickerField({ value, icon, onPress }: PickerFieldProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLORS.background,
   },
   content: {
