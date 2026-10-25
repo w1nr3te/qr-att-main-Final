@@ -122,7 +122,9 @@ export default function LoginScreen() {
                 </View>
               )}
             </View>
-
+            <Link href="/forgot-password" style={styles.link}>
+              Forgot password?
+            </Link>
             <Link href="/register" style={styles.link}>
               Don't have an account? Sign Up
             </Link>

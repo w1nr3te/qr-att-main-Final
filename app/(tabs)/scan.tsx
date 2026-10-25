@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import AppButton from '@/components/AppButton';
 import { COLORS } from '@/constants/colors';
-import { STUDENT_ID } from '@/constants/student';
 import { registerAttendance } from '@/lib/database';
 
 export default function ScanScreen() {
@@ -38,7 +37,7 @@ export default function ScanScreen() {
   const handleBarcodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
     setLastData(data);
-    registerAttendance(data, STUDENT_ID).then((result) => {
+    registerAttendance(data).then((result) => {
       setMessage(result.message);
       setSuccess(result.success);
     });

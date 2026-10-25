@@ -130,8 +130,8 @@ export default function TeacherScreen() {
           })
         );
       })
-      .catch(() => {
-        setMessage('Could not save the event. Only teachers can create events.');
+      .catch((err) => {
+        setMessage(`Could not save the event: ${err?.message ?? 'unknown error'}`);
       });
   };
 

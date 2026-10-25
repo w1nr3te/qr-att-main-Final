@@ -14,6 +14,7 @@ import AppButton from '@/components/AppButton';
 import { COLORS } from '@/constants/colors';
 import { useAuth, signOut } from '@/lib/auth';
 import { getProfile, updateProfile, type Profile } from '@/lib/profiles';
+import AttendanceSummary from '@/components/AttendanceSummary';
 
 export default function ProfileScreen() {
   const { user } = useAuth();
@@ -68,15 +69,20 @@ const handleSignOut = async () => {
     <View style={styles.container}>
       <Text style={styles.title}>My Profile</Text>
 
-      {profile?.role === 'teacher' ? (
-        <View style={styles.roleBadge}>
-          <Text style={styles.roleBadgeText}>Teacher</Text>
-        </View>
-      ) : (
-        <View style={[styles.roleBadge, styles.roleBadgeStudent]}>
-          <Text style={styles.roleBadgeText}>Student</Text>
-        </View>
-      )}
+      <View
+        style={[
+          styles.roleBadge,
+          (profile?.role ?? 'student') === 'student' && styles.roleBadgeStudent,
+        ]}
+      >
+        <Text style={styles.roleBadgeText}>
+          {profile?.role === 'admin'
+            ? 'Admin'
+            : profile?.role === 'teacher'
+            ? 'Teacher'
+            : 'Student'}
+        </Text>
+      </View>
 
       {user && (
         <View style={styles.infoCard}>
@@ -122,7 +128,7 @@ const handleSignOut = async () => {
           <Text style={styles.valueSmall}>{user.id}</Text>
         </View>
       )}
-
+      {profile?.role === 'student' && <AttendanceSummary />}
       <AppButton
         title="Sign Out"
         icon="log-out-outline"

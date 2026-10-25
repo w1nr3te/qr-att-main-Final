@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import { useAuth } from './auth';
 
-export type Role = 'student' | 'teacher';
+export type Role = 'student' | 'teacher' | 'admin';
 
 type ProfileState = {
   role: Role | null;
   loading: boolean;
-  isTeacher: boolean;
+  isTeacher: boolean; // true for teachers AND admins
+  isAdmin: boolean;
 };
 
 export function useProfile(): ProfileState {
@@ -42,5 +43,10 @@ export function useProfile(): ProfileState {
     };
   }, [user?.id]);
 
-  return { role, loading, isTeacher: role === 'teacher' };
+  return {
+    role,
+    loading,
+    isTeacher: role === 'teacher' || role === 'admin',
+    isAdmin: role === 'admin',
+  };
 }

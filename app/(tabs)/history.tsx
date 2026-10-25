@@ -3,18 +3,23 @@ import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { COLORS } from '@/constants/colors';
-import { STUDENT_ID } from '@/constants/student';
 import { getAttendanceHistory, type AttendanceRecord } from '@/lib/database';
+
+const STATUS_LABEL: Record<AttendanceRecord['status'], string> = {
+  early: 'Early',
+  on_time: 'On time',
+  late: 'Late',
+};
 
 export default function HistoryScreen() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadHistory = useCallback(() => {
-    getAttendanceHistory(STUDENT_ID).then((rows) => {
-      setRecords(rows);
-      setLoading(false);
-    });
+    getAttendanceHistory()
+      .then((rows) => setRecords(rows))
+      .catch(() => setRecords([]))
+      .finally(() => setLoading(false));
   }, []);
 
   useFocusEffect(
@@ -36,12 +41,12 @@ export default function HistoryScreen() {
       ) : (
         <FlatList
           data={records}
-          keyExtractor={(item) => String(item.id)}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.eventTitle}>{item.eventTitle}</Text>
-              <Text style={styles.eventMeta}>{item.eventId}</Text>
+              <Text style={styles.eventMeta}>{STATUS_LABEL[item.status]}</Text>
               <Text style={styles.eventMeta}>{formatDate(item.scannedAt)}</Text>
             </View>
           )}
